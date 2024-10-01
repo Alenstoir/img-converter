@@ -1,7 +1,7 @@
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 import tkinter as tk
 
-from converter.director import FileDirector
+from img_converter.converter.director import FileDirector
 
 
 class ImageConverterWindow(tk.Tk):
@@ -79,8 +79,13 @@ class ImageConverterWindow(tk.Tk):
         self.check_for_format()
 
     def perform_convert(self):
-        files = self.file_director.parse_directory_into_files(path=self._input_directory.get())
-        self.file_director.save_files_through_converter(files=files, output_path=self._output_directory.get(), file_format=self._chosen_format.get())
+        files, errors = self.file_director.parse_directory_into_files(path=self._input_directory.get())
+        if errors:
+            messagebox.showerror("Ошибки чтения файлов", "\n".join(errors))
+        errors = self.file_director.save_file_through_converter(files=files, output_path=self._output_directory.get(), file_format=self._chosen_format.get())
+        if errors:
+            messagebox.showerror("Ошибки записи файлов", "\n".join(errors))
+        messagebox.showinfo("Конвертация", "Конвертация завершена")
 
 
 def main():
